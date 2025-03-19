@@ -10,6 +10,8 @@ import { Task, TimeSlot, SmartSuggestion, UserPreference } from '@/types';
 import { mockTasks, mockSuggestions, mockProductivityData } from '@/utils/mockData';
 import { useToast } from '@/components/ui/use-toast';
 import { addMinutesToTime } from '@/utils/timeUtils';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 const Index = () => {
   const { toast } = useToast();
@@ -25,6 +27,17 @@ const Index = () => {
       setUserPreferences(JSON.parse(storedPreferences));
     }
   }, []);
+  
+  // Clear all tasks
+  const handleClearTasks = () => {
+    setTasks([]);
+    setSuggestions([]);
+    toast({
+      title: "Tasks Cleared",
+      description: "All tasks have been removed",
+      duration: 2000,
+    });
+  };
   
   // Generate smart suggestions based on user preferences
   const generateSmartSuggestion = (task: Task): SmartSuggestion | null => {
@@ -205,6 +218,18 @@ const Index = () => {
   return (
     <div className="min-h-screen max-w-7xl mx-auto px-4 py-8">
       <Header />
+      
+      <div className="flex justify-end mb-4">
+        <Button 
+          variant="destructive" 
+          size="sm" 
+          onClick={handleClearTasks}
+          className="flex items-center gap-1"
+        >
+          <Trash2 className="h-4 w-4" />
+          Clear All Tasks
+        </Button>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left Column: Task Form and Progress Tracker */}
