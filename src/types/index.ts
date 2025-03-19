@@ -54,4 +54,13 @@ export type UserPreference = {
     frequency: number; // in minutes
     duration: number; // in minutes
   };
+  activeTimeTracking: boolean;
+  productiveTimeSlots: TimeSlot[];
+  distractionFreeMode: boolean;
+};
+
+export type UserActivity = {
+  timestamp: Date;
+  activityType: 'active' | 'inactive' | 'focus' | 'break';
+  duration: number; // in minutes
 };
