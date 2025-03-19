@@ -4,6 +4,7 @@ import { formatDate } from '@/utils/timeUtils';
 import { Bell, Calendar, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const { toast } = useToast();
@@ -13,14 +14,6 @@ const Header: React.FC = () => {
     toast({
       title: "Notifications",
       description: "You have no new notifications.",
-      duration: 3000,
-    });
-  };
-
-  const handleSettingsClick = () => {
-    toast({
-      title: "Settings",
-      description: "Settings panel will be available in the next update.",
       duration: 3000,
     });
   };
@@ -44,15 +37,16 @@ const Header: React.FC = () => {
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="rounded-full h-10 w-10 p-0 border-none transition-all duration-300 hover:bg-accent"
-            onClick={handleSettingsClick}
-          >
-            <Settings className="h-5 w-5" />
-            <span className="sr-only">Settings</span>
-          </Button>
+          <Link to="/preferences">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-full h-10 w-10 p-0 border-none transition-all duration-300 hover:bg-accent"
+            >
+              <Settings className="h-5 w-5" />
+              <span className="sr-only">Settings</span>
+            </Button>
+          </Link>
         </div>
       </div>
     </header>

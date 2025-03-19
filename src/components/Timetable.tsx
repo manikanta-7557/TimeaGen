@@ -1,18 +1,20 @@
 
 import React from 'react';
 import { getDayName, getShortDayName, getTimeSlots, formatTime } from '@/utils/timeUtils';
-import { Task, TimeSlot } from '@/types';
+import { Task, TimeSlot, UserPreference } from '@/types';
 import { mockCategories } from '@/utils/mockData';
-import { Clock, AlertCircle } from 'lucide-react';
+import { Clock, AlertCircle, Focus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
 
 interface TimetableProps {
   tasks: Task[];
   onAssignTimeSlot: (taskId: string, timeSlot: TimeSlot) => void;
+  userPreferences?: UserPreference | null;
 }
 
-const Timetable: React.FC<TimetableProps> = ({ tasks, onAssignTimeSlot }) => {
+const Timetable: React.FC<TimetableProps> = ({ tasks, onAssignTimeSlot, userPreferences }) => {
   const { toast } = useToast();
   const timeSlots = getTimeSlots(8, 20, 60);
   const days = [0, 1, 2, 3, 4, 5, 6]; // Sunday to Saturday
@@ -37,6 +39,36 @@ const Timetable: React.FC<TimetableProps> = ({ tasks, onAssignTimeSlot }) => {
   // Get a lighter version of the color for the background
   const getLightColor = (color: string): string => {
     return `${color}20`; // Adding 20% opacity
+  };
+
+  // Check if a time slot is within focus time
+  const isInFocusTime = (time: string): boolean => {
+    if (!userPreferences) return false;
+    
+    const [focusStartHour, focusStartMinute] = userPreferences.focusTime.start.split(':').map(Number);
+    const [focusEndHour, focusEndMinute] = userPreferences.focusTime.end.split(':').map(Number);
+    const [slotHour, slotMinute] = time.split(':').map(Number);
+    
+    const focusStartMinutes = focusStartHour * 60 + focusStartMinute;
+    const focusEndMinutes = focusEndHour * 60 + focusEndMinute;
+    const slotMinutes = slotHour * 60 + slotMinute;
+    
+    return slotMinutes >= focusStartMinutes && slotMinutes < focusEndMinutes;
+  };
+  
+  // Check if a time slot is within working hours
+  const isInWorkingHours = (time: string): boolean => {
+    if (!userPreferences) return true; // Consider all hours as working hours if no preferences
+    
+    const [workStartHour, workStartMinute] = userPreferences.preferredWorkingHours.start.split(':').map(Number);
+    const [workEndHour, workEndMinute] = userPreferences.preferredWorkingHours.end.split(':').map(Number);
+    const [slotHour, slotMinute] = time.split(':').map(Number);
+    
+    const workStartMinutes = workStartHour * 60 + workStartMinute;
+    const workEndMinutes = workEndHour * 60 + workEndMinute;
+    const slotMinutes = slotHour * 60 + slotMinute;
+    
+    return slotMinutes >= workStartMinutes && slotMinutes < workEndMinutes;
   };
 
   // Handle click on an empty time slot
@@ -79,16 +111,32 @@ const Timetable: React.FC<TimetableProps> = ({ tasks, onAssignTimeSlot }) => {
             
             {timeSlots.map((time, timeIndex) => {
               const task = getTaskForTimeSlot(day, time);
+              const isFocusTime = isInFocusTime(time);
+              const isWorkingHour = isInWorkingHours(time);
               
               return (
                 <div 
                   key={`${day}-${timeIndex}`} 
-                  className={`h-24 border-t time-slot ${!task ? 'hover:bg-accent cursor-pointer' : ''}`}
+                  className={cn(
+                    "h-24 border-t time-slot",
+                    !task && "hover:bg-accent cursor-pointer",
+                    isFocusTime && "bg-primary/10",
+                    !isWorkingHour && "bg-muted/40"
+                  )}
                   onClick={() => !task && handleEmptySlotClick(day, time)}
                 >
+                  {isFocusTime && !task && (
+                    <div className="absolute top-1 right-1">
+                      <Focus className="h-4 w-4 text-primary/60" />
+                    </div>
+                  )}
+                  
                   {task ? (
                     <div 
-                      className="h-full p-2 overflow-hidden task-item" 
+                      className={cn(
+                        "h-full p-2 overflow-hidden task-item",
+                        isFocusTime && "ring-2 ring-primary/40 ring-inset"
+                      )}
                       style={{ 
                         backgroundColor: getLightColor(getTaskColor(task)),
                         borderLeft: `3px solid ${getTaskColor(task)}`
@@ -118,6 +166,19 @@ const Timetable: React.FC<TimetableProps> = ({ tasks, onAssignTimeSlot }) => {
           </div>
         ))}
       </div>
+      
+      {userPreferences && (
+        <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center">
+            <div className="h-3 w-3 bg-primary/10 mr-2"></div>
+            <span>Focus Time</span>
+          </div>
+          <div className="flex items-center">
+            <div className="h-3 w-3 bg-muted/40 mr-2"></div>
+            <span>Outside Working Hours</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
