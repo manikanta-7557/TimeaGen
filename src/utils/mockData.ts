@@ -1,4 +1,3 @@
-
 import { Task, TimeSlot, SmartSuggestion, ProductivityData, Category, UserPreference } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,88 +34,8 @@ export const mockTimeSlots: TimeSlot[] = [
   { id: '22', startTime: '15:30', endTime: '17:00', day: 0 },
 ];
 
-// Generate random tasks with different states
-export const generateMockTasks = (): Task[] => {
-  const tasks: Task[] = [];
-  const titles = [
-    'Complete project proposal',
-    'Review code changes',
-    'Prepare presentation',
-    'Client meeting',
-    'Weekly team sync',
-    'Research new technologies',
-    'Workout session',
-    'Read book chapter',
-    'Plan weekly meals',
-    'Study for exam',
-    'Call parents',
-    'Doctor appointment',
-    'Write blog post',
-    'Update portfolio',
-    'Grocery shopping'
-  ];
+export const mockTasks: Task[] = [];
 
-  const descriptions = [
-    'Need to finalize all the details and send to the client',
-    'Go through the pull requests and provide feedback',
-    'Create slides for the next team meeting',
-    'Discuss project status and next steps',
-    'Update the team on progress and blockers',
-    'Look into new frameworks that could improve our workflow',
-    'Focus on cardio and strength training',
-    'Continue reading the current book',
-    'Plan and prepare meals for the week',
-    'Review all study materials and practice problems',
-    'Catch up with family',
-    'Regular health checkup',
-    'Write content for the personal blog',
-    'Add recent projects and update skills',
-    'Get essentials for the week'
-  ];
-
-  const priorities = ['low', 'medium', 'high'] as const;
-
-  // Create tasks
-  for (let i = 0; i < 10; i++) {
-    const randomTitleIndex = Math.floor(Math.random() * titles.length);
-    const randomDescIndex = Math.floor(Math.random() * descriptions.length);
-    const randomPriorityIndex = Math.floor(Math.random() * priorities.length);
-    const randomCategoryIndex = Math.floor(Math.random() * mockCategories.length);
-    const randomDuration = Math.floor(Math.random() * 120) + 30; // 30 to 150 minutes
-    const randomProgress = Math.floor(Math.random() * 101); // 0 to 100
-    const randomCompleted = Math.random() > 0.7;
-
-    // Add some tasks with time slots assigned
-    const hasTimeSlot = Math.random() > 0.4;
-    const timeSlot = hasTimeSlot 
-      ? mockTimeSlots[Math.floor(Math.random() * mockTimeSlots.length)] 
-      : undefined;
-
-    // Create due date between now and 14 days in the future
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + Math.floor(Math.random() * 14) + 1);
-
-    tasks.push({
-      id: uuidv4(),
-      title: titles[randomTitleIndex],
-      description: descriptions[randomDescIndex],
-      duration: randomDuration,
-      priority: priorities[randomPriorityIndex],
-      completed: randomCompleted,
-      timeSlot,
-      progress: randomCompleted ? 100 : randomProgress,
-      category: mockCategories[randomCategoryIndex].id,
-      createdAt: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)), // Within last week
-      dueDate: Math.random() > 0.2 ? dueDate : undefined,
-    });
-  }
-
-  return tasks;
-};
-
-export const mockTasks = generateMockTasks();
-
-// Generate smart suggestions
 export const generateMockSuggestions = (): SmartSuggestion[] => {
   const suggestions: SmartSuggestion[] = [];
   const reasons = [
@@ -148,9 +67,8 @@ export const generateMockSuggestions = (): SmartSuggestion[] => {
   return suggestions;
 };
 
-export const mockSuggestions = generateMockSuggestions();
+export const mockSuggestions: SmartSuggestion[] = [];
 
-// Generate productivity data for analytics
 export const generateMockProductivityData = (): ProductivityData[] => {
   const data: ProductivityData[] = [];
   const today = new Date();
@@ -177,7 +95,6 @@ export const generateMockProductivityData = (): ProductivityData[] => {
 
 export const mockProductivityData = generateMockProductivityData();
 
-// Mock user preferences
 export const mockUserPreferences: UserPreference = {
   preferredWorkingHours: {
     start: '09:00',
@@ -190,5 +107,8 @@ export const mockUserPreferences: UserPreference = {
   breakPreferences: {
     frequency: 90, // Take a break every 90 minutes
     duration: 15 // Break for 15 minutes
-  }
+  },
+  activeTimeTracking: true,
+  productiveTimeSlots: [],
+  distractionFreeMode: false
 };
